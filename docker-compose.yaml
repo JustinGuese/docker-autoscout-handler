@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+    elasticsearch:
+        image: elasticsearch:7.9.2
+        container_name: elasticsearch
+        volumes:
+            - ./data/persistentdata/elastic:/usr/share/elasticsearch/data
+        environment:
+            - discovery.type=single-node
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+        networks:
+            - elastic
+
+    kibana:
+        image: kibana:7.9.2
+        container_name: kibana
+        ports:
+            - "5601:5601"
+        networks:
+            - elastic
+        depends_on:
+            - elasticsearch
+
+    copy2Elastic:
+        build: ./src
+        image: copy2elastic:latest
+        container_name: copy2elastic
+        command: bash -c "python loadIntoElastic.py" # tail -F anything
+        networks:
+            - elastic
+        volumes:
+            - ./data/input:/data/input
+            - ./data/output:/data/output
+        depends_on:
+            - elasticsearch
+        
+networks:
+    elastic:
+        driver: bridge
