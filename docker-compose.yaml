@@ -35,6 +35,18 @@ services:
             - ./data/output:/data/output
         depends_on:
             - elasticsearch
+
+    flaskQueryElastic:
+        build: ./flaskHandler/
+        image: flaskqueryelastic:latest
+        container_name: flaskqueryelastic
+        command: bash -c "python actors.py" 
+        networks:
+            - elastic
+        ports:
+            - "5000:5000"
+        depends_on:
+            - copy2Elastic
         
 networks:
     elastic:

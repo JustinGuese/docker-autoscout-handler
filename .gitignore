@@ -1,2 +1,3 @@
 data/persistentdata
 .ipynb_checkpoints/
+flaskHandler/src/__pycache__

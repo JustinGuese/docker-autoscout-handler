@@ -9,7 +9,7 @@ import elasticsearch
 import pandas as pd
 
 
-client = elasticsearch.Elasticsearch(["localhost:9200"])
+client = elasticsearch.Elasticsearch(["elasticsearch:9200"])
 
 app = Flask(__name__)
 
@@ -159,4 +159,4 @@ def internal_server_error(e):
 
 # keep this as is
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0',debug=True)
