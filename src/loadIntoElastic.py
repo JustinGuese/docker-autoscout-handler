@@ -42,17 +42,19 @@ dindaworkmean = []
 print(df.shape, " shape")
 meanDF = df.groupby(["Marke","Modell"]).agg(lambda x:x.value_counts().index[0])
 meanDF = meanDF.fillna(0)
+# somtimes theres a zero in there, which messes up the scheme
 for brand,model in meanDF.index:
-    p1 = meanDF.loc[brand,model].to_dict()
-    p1.update({"model":model})
-    p1.update({"brand":brand})
-    comb = str(brand)+"_"+str(model)
-    p1.update({"brand_model":comb})
-    # try elastic
-    try:
-        es.index(index="autoscout-mean", id=comb, body=p1)
-    except elasticsearch.exceptions.RequestError as e:
-        dindaworkmean.append([brand,model,str(e)])
+    if brand != 0 and model != 0:
+        p1 = meanDF.loc[brand,model].to_dict()
+        p1.update({"model":model})
+        p1.update({"brand":brand})
+        comb = str(brand)+"_"+str(model)
+        p1.update({"brand_model":comb})
+        # try elastic
+        try:
+            es.index(index="autoscout-mean", id=comb, body=p1)
+        except elasticsearch.exceptions.RequestError as e:
+            dindaworkmean.append([brand,model,str(e)])
 
 meanDF.to_csv("data/output/autoscout-mean.csv")
 
