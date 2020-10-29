@@ -92,7 +92,7 @@ def filterResults(df):
        'Schadstoffklasse', 'haendler', 'privat', 'ort',
        'ausstattung_liste', 'Zylinder', 'Leergewicht']]
     # rename some columns
-    df.columns = ["similarity_score","Preis","Marke","Modell","Erstzulassung","Karosserieform","Land","Garantie?","url", 'date',
+    df.columns = ["similarity_score","Preis","Marke","Modell","Erstzulassung","Karosserieform","Land","Garantie?","url", 'Datum gesehen',
        'Angebotsnummer', 'Außenfarbe', 'Lackierung', 'Farbe laut Hersteller',
        'Innenausstattung', 'Anzahl Türen', 'Sitzplätze',
        'Schlüsselnummer', 'Getriebeart', 'Gänge', 'Hubraum', 'Kraftstoff',
@@ -100,6 +100,11 @@ def filterResults(df):
        'ausstattung_liste', 'Zylinder', 'Leergewicht']
     link = baseurl + str(df["url"].values[0])
     df["url"] = link
+    # drop entries with zero
+    df = df[~(df==0)]
+    df = df[~(df=="0")]
+    df = df.dropna(axis=1)
+
     # replace some values
     df[df["Garantie?"]=="Tipp:Prüfe das Fahrzeug bei der Besichtigung auf Mängel. Generell gehen wir bei allen Angeboten von einem guten Fahrzeug-Zustand aus."] == "Nein"
     return df
