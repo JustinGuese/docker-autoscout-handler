@@ -15,9 +15,12 @@ app.config['SECRET_KEY'] = 'C2HWGVoMGfNTBsrYQg8EcMrdTimkZfAb'
 Bootstrap(app)
 
 def prepareDF(df):
-    df= df[["Marke","Modell","Preis","twinPrice","meanPrice","URL"]]
+    df= df[["Marke","Modell","km","ps","Preis","twinPrice","meanPrice","URL"]]
     df["Vorhergesagter Profit"] = (df["twinPrice"]*2+df["meanPrice"])/3 - df["Preis"]
-    df["Profit nach Twin"] = df["twinPrice"] - df["Preis"]
+    df["Profit laut Twin"] = df["twinPrice"] - df["Preis"]
+    # safety net, if profit too good delete it
+    df["Vorhergesagter Profit"][(df["Profit laut Twin"]/df["Preis"]) > 2] = 0 # set profit 0 if profit is X times the price
+
     # sort by profit
     df = df.sort_values(by="Vorhergesagter Profit",ascending=False,ignore_index=True)
     return df
