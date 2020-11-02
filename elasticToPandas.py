@@ -9,10 +9,11 @@ data = []
 
 # declare a filter query dict object
 match_all = {
-    "size": 100,
-    "query": {
-        "match_all": {}
-    }
+   "size": 50,
+   "sort": { "created": "desc"},
+   "query": {
+      "match_all": {}
+   }
 }
 # make a search() request to get all docs in the index
 resp = client.search(
