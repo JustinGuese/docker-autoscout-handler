@@ -12,17 +12,17 @@ services:
         networks:
             - elastic
 
-    # flaskQueryElastic:
-    #     build: ./flaskHandler/
-    #     image: flaskqueryelastic:latest
-    #     container_name: flaskqueryelastic
-    #     command: bash -c "python actors.py" 
-    #     networks:
-    #         - elastic
-    #     ports:
-    #         - "5000:5000"
-    #     depends_on:
-    #         - copy2Elastic
+    autoscout_flaskgetbest:
+        build: ./flaskGetBest/
+        image: autoscout_flaskgetbest:latest
+        container_name: autoscout_flaskgetbest
+        command: bash -c "python actors.py" 
+        networks:
+            - elastic
+        ports:
+            - "5000:5000"
+        depends_on: 
+            - autoscout_meanvalupdater
         
 networks:
     elastic:

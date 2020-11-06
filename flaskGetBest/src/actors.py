@@ -4,7 +4,7 @@ import elasticsearch
 import pandas as pd
 
 
-client = elasticsearch.Elasticsearch(["192.168.0.242:9200"])
+client = elasticsearch.Elasticsearch(["elasticsearch:9200"])
 
 app = Flask(__name__)
 

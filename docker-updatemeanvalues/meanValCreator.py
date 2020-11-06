@@ -58,14 +58,15 @@ mapping = {
         "CO2-Emissionen": {"type": "short" },
         "Beschreibung": {"type": "text" },
           }}}
-try:
-    response = es.indices.create(
-        index="autoscout-meanvalues",
-        body=mapping
-        )
-except Exception as e:
-    print("index mapping failed,maybe the index is already created?")
-    print(str(e))
+for idx in ["autoscout-meanvalues","autoscout-candidates","autoscout-mean-candidates"]:
+  try:
+      response = es.indices.create(
+          index=idx,
+          body=mapping
+          )
+  except Exception as e:
+      print("Skip: index mapping failed,maybe the index is already created?")
+      print(str(e))
 
 from tqdm import tqdm
 
