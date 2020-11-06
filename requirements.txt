@@ -3,3 +3,5 @@ elasticsearch
 Flask-WTF
 Flask-Bootstrap4
 elasticsearch_dsl
+numpy
+tqdm

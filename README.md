@@ -13,3 +13,8 @@ easiest way:
   wrong, just run elasticToPandas.py
 
   output in autoscout-singlecar.py
+
+
+# indices
+
+autoscout-singlecar
