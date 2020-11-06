@@ -15,6 +15,7 @@ services:
     autoscout_flaskgetbest:
         build: ./flaskGetBest/
         image: autoscout_flaskgetbest:latest
+        restart: always
         container_name: autoscout_flaskgetbest
         command: bash -c "python actors.py" 
         networks:
