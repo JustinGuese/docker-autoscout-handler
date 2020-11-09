@@ -1,29 +1,56 @@
 version: '3.8'
 # docker-autoscout-crawler should be running! in it elastic and co are defined
 services:
-    autoscout_meanvalupdater:
-        build: ./docker-updatemeanvalues
-        image: autoscout_meanvalupdater:latest
-        container_name: autoscout_meanvalupdater
-        #command: bash -c "python loadIntoElastic.py" # tail -F anything
-        volumes:
-            - ./data/input:/data/input
-            - ./data/output:/data/output
-        networks:
-            - elastic
+    # autoscout_meanvalupdater:
+    #     build: ./docker-updatemeanvalues
+    #     image: autoscout_meanvalupdater:latest
+    #     container_name: autoscout_meanvalupdater
+    #     #command: bash -c "python loadIntoElastic.py" # tail -F anything
+    #     volumes:
+    #         - ./data/input:/data/input
+    #         - ./data/output:/data/output
+    #     networks:
+    #         - elastic
 
-    autoscout_flaskgetbest:
-        build: ./flaskGetBest/
-        image: autoscout_flaskgetbest:latest
+    # autoscout_flaskgetbest:
+    #     build: ./flaskGetBest/
+    #     image: autoscout_flaskgetbest:latest
+    #     restart: always
+    #     container_name: autoscout_flaskgetbest
+    #     command: bash -c "python actors.py" 
+    #     networks:
+    #         - elastic
+    #     ports:
+    #         - "5000:5000"
+        # depends_on: 
+        #     - autoscout_meanvalupdater
+
+    # wp for handling subscriptions and shit
+
+    wordpress:
+        image: wordpress
         restart: always
-        container_name: autoscout_flaskgetbest
-        command: bash -c "python actors.py" 
-        networks:
-            - elastic
         ports:
-            - "5000:5000"
-        depends_on: 
-            - autoscout_meanvalupdater
+        - 9090:80
+        environment:
+            WORDPRESS_DB_HOST: wp_db
+            WORDPRESS_DB_USER: exampleuser
+            WORDPRESS_DB_PASSWORD: examplepass
+            WORDPRESS_DB_NAME: exampledb
+        volumes:
+        - ./wp-interface/persistentdata/wp-content:/var/www/html/wp-content
+
+    wp_db:
+        image: mariadb
+        restart: always
+        environment:
+            MYSQL_DATABASE: exampledb
+            MYSQL_USER: exampleuser
+            MYSQL_PASSWORD: examplepass
+            MYSQL_RANDOM_ROOT_PASSWORD: '1'
+        volumes:
+        - ./wp-interface/persistentdata/sql:/var/lib/mysql
+
         
 networks:
     elastic:
