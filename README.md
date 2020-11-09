@@ -18,3 +18,8 @@ easiest way:
 # indices
 
 autoscout-singlecar
+
+
+# TODO
+
+script running through all candidates and calculating the expected price

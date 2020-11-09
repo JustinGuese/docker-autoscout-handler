@@ -27,7 +27,7 @@ services:
 
     # wp for handling subscriptions and shit
 
-    wordpress:
+    autoscout_wordpress:
         image: wordpress
         restart: always
         ports:
@@ -40,7 +40,7 @@ services:
         volumes:
         - ./wp-interface/persistentdata/wp-content:/var/www/html/wp-content
 
-    wp_db:
+    autoscout_wp_db:
         image: mariadb
         restart: always
         environment:
