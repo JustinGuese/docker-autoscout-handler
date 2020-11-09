@@ -1,13 +1,21 @@
 from flask import Flask, render_template, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, SelectField
 from wtforms.validators import DataRequired
 import elasticsearch
 import pandas as pd
+import pickle
 
 
 client = elasticsearch.Elasticsearch(["elasticsearch:9200"])
+with open("modelbrandcombinations.pickle", "rb") as file:
+    modelbrandcomb = pickle.load(file)
+combs = []
+for tup in modelbrandcomb:
+    combs.append(" ".join(tup))
+modelbrandcomb = combs
+del combs
 
 app = Flask(__name__)
 
@@ -15,7 +23,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'C2HWGVoMGfNTBsrYQg8EcMrdTimkZfAb'
 
 class NameForm(FlaskForm):
-    name = StringField('Was für ein Auto suchen Sie?', validators=[DataRequired()])
+    name = SelectField(label='Marke und Modell', choices=modelbrandcomb)
     submit = SubmitField('Suchen')
 
 # Flask-Bootstrap requires this line
@@ -53,21 +61,37 @@ def base(size=50,term={}):
         df = prepareDF(df)
     return df
 
-def specificSearch(searchterm):  
+def specificSearch(brand,model):  
     try:
-        query = {
-        "from":10,
-        "size":10,
-        "query": {
-            "query_string": {
-            "query": searchterm
+        query ={
+            "size": 10,
+            "query": {
+                "bool": {
+                "should": [
+                    {
+                    "match": {
+                        "Marke" : {
+                        "query" :  brand,
+                        "fuzziness": "AUTO"
+                        }
+                    }
+                    },
+                    {
+                    "match": {
+                        "Modell" : {
+                        "query" :  model,
+                        "fuzziness": "AUTO"
+                        }
+                    }
+                    }
+                ]
+                }
             }
-        }
-        }
+            }
         res = client.search(
-        index = "autoscout-candidates",
-        body = query,
-        )["hits"]["hits"]
+            index = "autoscout-candidates",
+                    body = query)["hits"]["hits"]
+        message = str(res) + str(query)
         if len(res) > 0:
             tmp = []
             for entry in res:
@@ -77,6 +101,7 @@ def specificSearch(searchterm):
             message = df.to_html(header=True,justify="center",render_links=True)
     except Exception as e:
         message = "That car is not in our database." +  str(e)
+        raise 
     return message     
 
 def elasticSearch():
@@ -125,10 +150,10 @@ def spezialsuche():
     form = NameForm()
     message = ""
     if form.validate_on_submit():
-        name = form.name.data
-        if len(name) > 0:
+        brand,model = form.name.data.split(" ")
+        if len(brand) > 0:
             # empty the form field
-            message = specificSearch(name)
+            message = specificSearch(brand,model)
         else:
             message = "That car is not in our database."
     return render_template('suche.html', form=form, message=message)
