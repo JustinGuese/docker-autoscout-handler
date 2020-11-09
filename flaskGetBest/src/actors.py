@@ -49,6 +49,34 @@ def elasticSearch():
         message = "That car is not in our database."
     return message
 
+def elasticSearchFree():
+    match_all = {
+    "size": 20,
+    "sort": { "created": "desc"},
+    "query": {
+        "match_all": {}
+    }
+    }
+    # make a search() request to get all docs in the index
+    res = client.search(
+        index = "autoscout-candidates",
+        body = match_all,
+    )["hits"]["hits"]
+    if len(res) > 0:
+        tmp = []
+        for entry in res:
+            tmp.append(entry["_source"])
+        df = pd.DataFrame(data=tmp)
+        df = prepareDF(df)
+        # free trial additions
+        df["URL"][:10] = "Nur für Mitglieder sichtbar"
+        # end free trial additions
+        message = df.to_html(header=True,justify="center",render_links=True)
+    else:
+        message = "That car is not in our database."
+    return message
+
+
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -56,7 +84,10 @@ def index():
     message = elasticSearch()
     return render_template('index.html', message=message)
 
-
+@app.route('/free', methods=['GET', 'POST'])
+def free():
+    message = elasticSearchFree()
+    return render_template('index.html', message=message)
 
 
 @app.errorhandler(404)
